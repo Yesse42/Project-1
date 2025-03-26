@@ -52,12 +52,11 @@ end
 
 function RadiativeParams(ν::Unitful.Frequency, I0_down::T1, I0_up::T2, atmosphere::AtmosphereParams, view_zenith_angle::V) where {T1, T2, V}
     λ = Unitful.c / ν
-    k_abs = compute_k_abs(ν, atmosphere)
     return RadiativeParams(λ, I0_down, I0_up, atmosphere, view_zenith_angle)
 end
 
-function compute_k_abs(λ::S, atmosphere::AtmosphereParams) where {S}
-    k_abs = absorb_all.(λ, atmosphere.T, atmosphere.P, atmosphere.ρ_v, atmosphere.clw)
+function compute_k_abs(ν::Unitful.Frequency, atmosphere::AtmosphereParams)
+    k_abs = absorb_all.(ν, atmosphere.T, atmosphere.P, atmosphere.ρ_v, atmosphere.clw)
     return k_abs
 end
 

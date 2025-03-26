@@ -35,7 +35,7 @@ function get_upwelling_radiation(clw_func, band::Unitful.Frequency; atm = standa
     return solve_RTE(model).up[end]
 end
 
-concs = [0.25, 0.5, 1, 2, 4] * u"g/m^3"
+concs = (0.05:0.1:3) .* u"g/m^3"
 
 cloudfuncs = reduce(vcat, [[(z -> if z<= 1000u"m" conc else 0.0u"g/m^3" end), (z-> if (3000u"m" <= z <= 4000u"m") conc else 0.0u"g/m^3" end), (z-> conc * exp(-((z - 2000u"m")/1u"km")^2))] for conc in concs])
 
@@ -47,14 +47,17 @@ upwelling_radiation = [collect(get_upwelling_radiation.(cloudfuncs, band)) for b
 
 for (i, band) in enumerate(bands)
     p = scatter(
-        upwelling_radiation[i],
+        uconvert.(u"W/m^2/μm", upwelling_radiation[i]),
         integrated_water,
-        label = ["Low" "High" "Constant"],
-        xlabel = "Upwelling Radiation (W/m^2)",
-        ylabel = "Integrated Water (g/m^2)",
+        label = "",
+        xlabel = "Upwelling Radiation",
+        ylabel = "Integrated Water",
         title = "Integrated Water vs Upwelling Radiation for $band",
     )
     display(p)
+    if i == 3
+        savefig(p, joinpath(visdir, "clw_vs_upwelling_10GHz.png"))
+    end
 end
 
 best_idx = 3
