@@ -1,0 +1,73 @@
+cd(@__DIR__)
+include("../model_structures.jl")
+include("../model_functions.jl")
+include("../test_cases/model_atm.jl")
+
+using Plots, DataFrames, BenchmarkTools, Trapz, Polynomials
+
+visdir = joinpath(@__DIR__, "../..", "vis", "clw")
+
+clw = fill(0.0u"g/m^3", length(standard_atm.Hgt))
+
+standard_atm = AtmosphereParams(
+    standard_atm.Hgt,
+    standard_atm.T,
+    standard_atm.Pressure,
+    standard_atm.H20,
+    clw
+)
+
+standard_atm = upscale_atm_res(standard_atm, 1000)
+
+#Get some bands
+bands = [89, 30, 10] * u"GHz"
+
+"Make a function to get the upwelling radiation in the standard atmosphere for a given clw function"
+function get_upwelling_radiation(clw_func, band::Unitful.Frequency; atm = standard_atm, t_sfc = 288u"K", emiss = 0.5)
+    clw = clw_func.(atm.z)
+    atm.clw .= clw
+    rad_units = u"W/m^3"
+    model = RTEModel(
+        SurfaceParams(t_sfc, emiss, 1-emiss),
+        standard_atm,
+        RadiativeParams(band, 0.0*rad_units, 0.0*rad_units, standard_atm, 0.0u"°")
+    )   
+    return solve_RTE(model).up[end]
+end
+
+concs = [0.25, 0.5, 1, 2, 4] * u"g/m^3"
+
+cloudfuncs = reduce(vcat, [[(z -> if z<= 1000u"m" conc else 0.0u"g/m^3" end), (z-> if (3000u"m" <= z <= 4000u"m") conc else 0.0u"g/m^3" end), (z-> conc * exp(-((z - 2000u"m")/1u"km")^2))] for conc in concs])
+
+#Calculate the integrated water for each cloudfunc
+integrated_water = [upreferred(trapz(standard_atm.z, func.(standard_atm.z))) for func in cloudfuncs]
+
+#Get the upwelling radiation for each cloudfunc
+upwelling_radiation = [collect(get_upwelling_radiation.(cloudfuncs, band)) for band in bands]
+
+for (i, band) in enumerate(bands)
+    p = scatter(
+        upwelling_radiation[i],
+        integrated_water,
+        label = ["Low" "High" "Constant"],
+        xlabel = "Upwelling Radiation (W/m^2)",
+        ylabel = "Integrated Water (g/m^2)",
+        title = "Integrated Water vs Upwelling Radiation for $band",
+    )
+    display(p)
+end
+
+best_idx = 3
+lin_fit = coeffs(fit(Polynomial,
+    ustrip.(upwelling_radiation[best_idx][:]),
+    ustrip.(integrated_water[:]),
+    1
+))
+const intercept = lin_fit[1] * unit(integrated_water[1])
+const slope = lin_fit[2] * (unit(upwelling_radiation[best_idx][1]) / unit(integrated_water[1]))^-1
+println("Intercept: $intercept")
+println("Slope: $slope")
+
+function get_clw_from_10GHz(reading)
+    return intercept + slope * reading
+end
