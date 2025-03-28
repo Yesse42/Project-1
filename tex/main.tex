@@ -1,0 +1,90 @@
+\documentclass{article}
+
+% Set page size and margins
+% Replace `letterpaper' with`a4paper' for UK/EU standard size
+\usepackage[letterpaper,top=2cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{siunitx}
+\graphicspath{ {../vis} }
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+
+\title{ATS 622 Project 1}
+\author{Jesse Robinett}
+
+\begin{document}
+\maketitle
+
+\section*{Part A}
+
+\begin{figure}[H]
+	\includegraphics[width=0.8\textwidth]{absorption_spectrum.png}
+    \caption{k\_abs for 1-300GHz}
+\end{figure}
+
+The results concur with the figure given in the project, as the frequencies with a high absorption coefficient are the ones with the lowest transmittance in that figure.
+
+\section*{Part B}
+
+\begin{figure}[H]
+	\includegraphics[width=0.8\textwidth]{part_b.png}
+    \caption{Handwritten Derivation of }
+\end{figure}
+
+Thus by simple algebra the brightness temperature is given by $$ T_b(I_\lambda, \lambda) = \frac{\lambda^4 I_\lambda}{2k_bc}$$ where $ I_\lambda $ is the monochromatic intensity measured.
+
+\section*{Part C}
+
+You can find the full project repository on GitHub at the following link: 
+\href{https://github.com/Yesse42/Project-1}{https://github.com/Yesse42/Project-1}
+
+\section*{Part D}
+
+\begin{figure}[H]
+    \includegraphics[width = 0.8\textwidth]{tests/downwelling_radiation_vs_zenith_angle.png}
+    \caption{This is a langley plot of downwelling radiation vs zenith angle for the $k_{abs}$ of the standard atmosphere at 183GHz, but with the temperature then set to 0K so that there is no emission. The langley plot correctly calculates both $I_0 = \qty{1}{W/m^2/\mu m}$ and $\tau = 6.153$ for the downwelling radiation. Thus we at least know the attenuation of $I_0$ is correct.}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width = 0.8\textwidth]{tests/50GHz_RTE_surface_emissivity_0.png}
+    \caption{A 50 GHz RTE plot for the standard atmosphere, with a surface emissivity of 0. The total reflection is correct, and the behavior is otherwise reasonable}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{tests/full_wv_model.png}
+    \caption{A 183 GHz RTE with excessive water vapor at all levels. As expected, the brightness temperatures closely track the temperature profile given the absurd absorption coefficients.}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{tests/no_air_model.png}
+    \caption{An RTE with no atmosphere, and a sfc temp of \qty{288}{K}, with an emissivity of 1. The brightness temperature is equal to the surface temperature, as expected, through the whole column. The nonzero initial downwelling radiation is also not attenuated at all, as expected, and is completely absorbed by the surface}
+\end{figure}
+
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{tests/sinusoidal_t_model.png}
+    \caption{This shows an RTE with a uniform k of \qty{0.0757}{1/km} and a sinusoidal temperature profile, with a perfectly reflective surface. As expected, the brightness temperature also oscillates, and importantly, when the environmental temperature is higher than the brightness temperature, the brightness temperature increases, while it decreases when the environmental temperature is lower.}
+\end{figure}
+
+As the behavior is as expected in every one of these test cases, I am fairly confident that my RTE code is correct.
+
+\section*{Part E}
+
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{RTE_solution_183_GHz.png}
+    \caption{As requested, here is the \qty{183}{GHz} RTE solution, with a downwelling brightness temperature of around \qty{287.3}{K} and an upwelling temperature of \qty{233.3}{K}. Note that the standard atmosphere has been uspcaled to 10,000 equally spaced levels by linear interpolation.}
+\end{figure}
+
+\section*{Part F}
+Use the RTE code to determine some relationship between upwelling radiation and cloud liquid water
+\begin{figure}[H]
+    \includegraphics[width=0.8\textwidth]{clw/clw_vs_upwelling_10GHz.png}
+    \caption{A plot showing the upwelling radiation measured at \qty{10}{GHz} for various total cloud liquid water contents in the standard atmosphere (linearly upscaled to 1000 layers) with various clouds. There is a low cloud with uniform clw concentrations below 1000m, a high cloud with uniform concentration between 3000 and 4000m, and a mid level gaussian cloud centered on 2000m with a 1km standard deviation.}
+\end{figure}
+
+As can be clearly seen in the above plot, at the weakly interacting 10GHz line there is a nearly linear relationship between the integrated cloud water and upwelling radiation, for each cloud type. This is because the weak absorption means that $\tau$ still small and so the fit is thus mostly linear. However, each type of cloud has a slightly different linear fit due to the different altitude and temperature of the cloud. Irregardless of this fact, fitting a linear trend to this data and using that to retrieve total cloud liquid water from 10,000 random gaussian clouds with centers between 0 and 5km, standard deviations between 0.05 and 2km, and peak clw concentrations between 0.01 and \qty{4}{g/m^3} yields an average error of around 17\%, which is not great but also not terrible given how slapdash the retrieval method is.
+
+
+\end{document}
