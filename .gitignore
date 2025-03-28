@@ -1,1 +1,9 @@
 *.png
+*.aux
+*.bbl
+*.fdb_*
+*.fls
+*.log
+*.out
+*.synctex.*
+*.pdf
