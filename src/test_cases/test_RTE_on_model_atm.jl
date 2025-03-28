@@ -53,3 +53,7 @@ xlabel!("Height (m)")
 ylabel!("Brightness Temperature (K)")
 display(plot!(; legend = :topright, dpi = 500))
 savefig(joinpath(visdir, "RTE_solution_183_GHz.png"))
+
+quicksol = solve_rte_only_TOA_SFC(model)
+display(T_b(quicksol.up, λ))
+display(T_b(quicksol.down, λ))

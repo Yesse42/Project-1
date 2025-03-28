@@ -7,13 +7,13 @@ using Random
 
 band = 10u"GHz"
 
-n_profiles = 500
+n_profiles = 10000
 errors = Float64[]
 
 for _ in 1:n_profiles
-    amount = rand((0.01:0.01:2)u"g/m^3")
-    center = rand((1:0.1:3)u"km")
-    spread = rand((0.1:0.1:1)u"km")
+    amount = rand((0.01:0.01:4)u"g/m^3")
+    center = rand((0:0.1:5)u"km")
+    spread = rand((0.05:0.01:2)u"km")
     rand_func(z) = amount * exp(-((z - center)/spread)^2)
     upwelling_radiation = get_upwelling_radiation(rand_func, band)
     clw_sensed = get_clw_from_10GHz(upwelling_radiation)

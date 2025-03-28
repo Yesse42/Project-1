@@ -32,12 +32,15 @@ function get_upwelling_radiation(clw_func, band::Unitful.Frequency; atm = standa
         standard_atm,
         RadiativeParams(band, 0.0*rad_units, 0.0*rad_units, standard_atm, 0.0u"°")
     )   
-    return solve_RTE(model).up[end]
+    return solve_rte_only_TOA_SFC(model).up
 end
 
 concs = (0.05:0.1:3) .* u"g/m^3"
 
 cloudfuncs = reduce(vcat, [[(z -> if z<= 1000u"m" conc else 0.0u"g/m^3" end), (z-> if (3000u"m" <= z <= 4000u"m") conc else 0.0u"g/m^3" end), (z-> conc * exp(-((z - 2000u"m")/1u"km")^2))] for conc in concs])
+
+colors = reduce(vcat, [[:red, :green, :blue] for _ in concs])
+color_names = ["Low Cloud", "High Cloud", "Mid Level Gaussian Cloud"]
 
 #Calculate the integrated water for each cloudfunc
 integrated_water = [upreferred(trapz(standard_atm.z, func.(standard_atm.z))) for func in cloudfuncs]
@@ -49,11 +52,18 @@ for (i, band) in enumerate(bands)
     p = scatter(
         uconvert.(u"W/m^2/μm", upwelling_radiation[i]),
         integrated_water,
+        c = colors,
         label = "",
         xlabel = "Upwelling Radiation",
         ylabel = "Integrated Water",
         title = "Integrated Water vs Upwelling Radiation for $band",
-    )
+        xlims = (-Inf, 1.6e-12),
+        ylims = (-Inf, 2.4),
+        dpi = 500
+    )    #Add a legend
+    for (j, color) in enumerate([:red, :green, :blue])
+        scatter!(p, [NaN], [NaN], label = color_names[j], c = color)
+    end
     display(p)
     if i == 3
         savefig(p, joinpath(visdir, "clw_vs_upwelling_10GHz.png"))
