@@ -7,7 +7,7 @@ using Random
 
 band = 10u"GHz"
 
-n_profiles = 10000
+n_profiles = Int(1e5)
 errors = Float64[]
 
 for _ in 1:n_profiles

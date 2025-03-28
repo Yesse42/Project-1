@@ -31,7 +31,7 @@ The results concur with the figure given in the project, as the frequencies with
 
 \begin{figure}[H]
 	\includegraphics[width=0.8\textwidth]{part_b.png}
-    \caption{Handwritten Derivation of }
+    \caption{Handwritten Derivation of relationship between brightness temperatures and intensities}
 \end{figure}
 
 Thus by simple algebra the brightness temperature is given by $$ T_b(I_\lambda, \lambda) = \frac{\lambda^4 I_\lambda}{2k_bc}$$ where $ I_\lambda $ is the monochromatic intensity measured.
@@ -74,7 +74,7 @@ As the behavior is as expected in every one of these test cases, I am fairly con
 
 \begin{figure}[H]
     \includegraphics[width=0.8\textwidth]{RTE_solution_183_GHz.png}
-    \caption{As requested, here is the \qty{183}{GHz} RTE solution, with a downwelling brightness temperature of around \qty{287.3}{K} and an upwelling temperature of \qty{233.3}{K}. Note that the standard atmosphere has been uspcaled to 10,000 equally spaced levels by linear interpolation.}
+    \caption{As requested, here is the \qty{183}{GHz} RTE solution for $\alpha_{sfc} = 0.5$ , with a downwelling brightness temperature of around \qty{287.3}{K} and an upwelling temperature of \qty{233.3}{K}. Note that the standard atmosphere has been uspcaled to 10,000 equally spaced levels by linear interpolation.}
 \end{figure}
 
 \section*{Part F}
@@ -84,7 +84,7 @@ Use the RTE code to determine some relationship between upwelling radiation and 
     \caption{A plot showing the upwelling radiation measured at \qty{10}{GHz} for various total cloud liquid water contents in the standard atmosphere (linearly upscaled to 1000 layers) with various clouds. There is a low cloud with uniform clw concentrations below 1000m, a high cloud with uniform concentration between 3000 and 4000m, and a mid level gaussian cloud centered on 2000m with a 1km standard deviation.}
 \end{figure}
 
-As can be clearly seen in the above plot, at the weakly interacting 10GHz line there is a nearly linear relationship between the integrated cloud water and upwelling radiation, for each cloud type. This is because the weak absorption means that $\tau$ still small and so the fit is thus mostly linear. However, each type of cloud has a slightly different linear fit due to the different altitude and temperature of the cloud. Irregardless of this fact, fitting a linear trend to this data and using that to retrieve total cloud liquid water from 10,000 random gaussian clouds with centers between 0 and 5km, standard deviations between 0.05 and 2km, and peak clw concentrations between 0.01 and \qty{4}{g/m^3} yields an average error of around 17\%, which is not great but also not terrible given how slapdash the retrieval method is.
+As can be clearly seen in the above plot, at the weakly interacting 10GHz line there is a nearly linear relationship between the integrated cloud water and upwelling radiation, for each cloud type. This is because the weak absorption means that $\tau$ still small and so the fit is thus mostly linear. However, each type of cloud has a slightly different linear fit due to the different altitude and temperature of the cloud. Irregardless of this fact, fitting a linear trend to this data and using that to retrieve total cloud liquid water from 100,000 random gaussian clouds with centers between 0 and 5km, standard deviations between 0.05 and 2km, and peak clw concentrations between 0.01 and \qty{4}{g/m^3} yields an average error of around 17.1\%, which is not great but also not terrible given how slapdash the retrieval method is.
 
 
 \end{document}
